@@ -19,7 +19,6 @@
 class Fluent::KubernetesOutput < Fluent::Output
   Fluent::Plugin.register_output('kubernetes', self)
 
-  config_param :container_id, :string
   config_param :tag, :string
   config_param :kubernetes_pod_regex, :string, default: '^[^_]+_([^\.]+)\.[^_]+_([^\.]+)\.([^\.]+)'
 
@@ -36,48 +35,34 @@ class Fluent::KubernetesOutput < Fluent::Output
 
   def emit(tag, es, chain)
     es.each do |time,record|
-      Fluent::Engine.emit('kubernetes',
+      record = enrich_record(record)
+      Fluent::Engine.emit(@tag,
                           time,
-                          enrich_record(tag, record))
+                          record)
     end
 
     chain.next
   end
 
   private
-
-  def interpolate(tag, str)
-    tag_parts = tag.split('.')
-
-    str.gsub(/\$\{tag_parts\[(\d+)\]\}/) { |m| tag_parts[$1.to_i] }
-  end
-
-  def enrich_record(tag, record)
-    id = interpolate(tag, @container_id)
-    if !id.empty?
-      record['container_id'] = id
-      record = enrich_container_data(id, record)
-      record = merge_json_log(record)
-    end
+  
+  def enrich_record(record)
+    record = enrich_container_data(record)
+    record = merge_json_log(record)
     record
   end
 
-  def enrich_container_data(id, record)
-    container = Docker::Container.get(id)
-    if container
-      container_name = container.json['Name']
-      if container_name
-        record["container_name"] = container_name[1..-1] if container_name[0] == '/'
-        regex = Regexp.new(@kubernetes_pod_regex)
-        match = container_name.match(regex)
-        if match
-          pod_container_name, pod_name, pod_namespace =
-            match.captures
-          record["pod_namespace"] = pod_namespace
-          record["pod"] = pod_name
-          record["pod_container"] = pod_container_name
-        end
-      end
+  def enrich_container_data(record)
+    container_name = record["container_name"]
+    container_name = container_name[1..-1] if container_name[0] == '/'
+    regex = Regexp.new(@kubernetes_pod_regex)
+    match = container_name.match(regex)
+    if match
+      pod_container_name, pod_name, pod_namespace =
+        match.captures
+      record["namespace"] = pod_namespace
+      record["pod"] = pod_name
+      record["pod_container"] = pod_container_name
     end
     record
   end
@@ -88,10 +73,7 @@ class Fluent::KubernetesOutput < Fluent::Output
       if log[0].eql?('{') && log[-1].eql?('}')
         begin
           parsed_log = JSON.parse(log)
-          record = record.merge(parsed_log)
-          unless parsed_log.has_key?('log')
-            record.delete('log')
-          end
+          record['parsed_log'] = parsed_log
         rescue JSON::ParserError
         end
       end
