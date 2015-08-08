@@ -29,7 +29,6 @@ class Fluent::KubernetesOutput < Fluent::Output
   def configure(conf)
     super
 
-    require 'docker'
     require 'json'
   end
 
