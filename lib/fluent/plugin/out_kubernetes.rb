@@ -35,7 +35,7 @@ class Fluent::KubernetesOutput < Fluent::Output
 
   def emit(tag, es, chain)
     es.each do |time,record|
-      record = enrich_record(record)
+      record = enrich_container_data(record)
       Fluent::Engine.emit(@tag,
                           time,
                           record)
@@ -45,12 +45,6 @@ class Fluent::KubernetesOutput < Fluent::Output
   end
 
   private
-  
-  def enrich_record(record)
-    record = enrich_container_data(record)
-    record = merge_json_log(record)
-    record
-  end
 
   def enrich_container_data(record)
     container_name = record["container_name"]
@@ -66,19 +60,4 @@ class Fluent::KubernetesOutput < Fluent::Output
     end
     record
   end
-
-  def merge_json_log(record)
-    if record.has_key?('log')
-      log = record['log'].strip
-      if log[0].eql?('{') && log[-1].eql?('}')
-        begin
-          parsed_log = JSON.parse(log)
-          record['parsed_log'] = parsed_log
-        rescue JSON::ParserError
-        end
-      end
-    end
-    record
-  end
-
 end
