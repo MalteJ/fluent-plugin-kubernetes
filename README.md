@@ -37,7 +37,7 @@ The output becomes as belows
   "stream": "stdout",
   "time": "2015-03-07T20:04:17.604503223Z"
   "container_id": "0bbc558cca13c5a92cc59f33626db0aaa2afea24742d2fbe549e3a30faf7ab09",
-  "container_name": "k8s_CONTAINER.2f44475a_POD.NAMESPACE.api_ae0aeb72-c44f-11e4-a274-54ee7527188d_d442134f",
+  "container_name": "k8s_CONTAINER.2f44475a_POD_NAMESPACE_api_ae0aeb72-c44f-11e4-a274-54ee7527188d_d442134f",
   "pod": "POD",
   "pod_namespace": "NAMESPACE",
   "pod_container": "CONTAINER"
@@ -76,7 +76,7 @@ Then output becomes as belows
   "stream" : "stdout",
   "time" : "2015-03-07T20:04:17.604503223Z",
   "container_id" : "0bbc558cca13c5a92cc59f33626db0aaa2afea24742d2fbe549e3a30faf7ab09",
-  "container_name" : "k8s_CONTAINER.2f44475a_POD.NAMESPACE.api_ae0aeb72-c44f-11e4-a274-54ee7527188d_d442134f",
+  "container_name" : "k8s_CONTAINER.2f44475a_POD_NAMESPACE_api_ae0aeb72-c44f-11e4-a274-54ee7527188d_d442134f",
   "pod" : "POD",
   "pod_namespace" : "NAMESPACE",
   "pod_container" : "CONTAINER"
