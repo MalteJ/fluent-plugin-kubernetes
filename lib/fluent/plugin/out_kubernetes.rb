@@ -20,7 +20,7 @@ class Fluent::KubernetesOutput < Fluent::Output
   Fluent::Plugin.register_output('kubernetes', self)
 
   config_param :tag, :string
-  config_param :kubernetes_pod_regex, :string, default: '^[^_]+_([^\.]+)\.[^_]+_([^\.]+)\.([^\.]+)'
+  config_param :kubernetes_pod_regex, :string, default: '^[^_]+_([^\.]+)\.[^_]+_([^_]+)_([^_]+)'
 
   def initialize
     super
